@@ -82,8 +82,12 @@ WSGI_APPLICATION = 'task_mgt.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'tasks_db',
+        'USER': 'root',
+        'PASSWORD': '123Ezekiel.com',
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
@@ -138,4 +142,9 @@ REST_FRAMEWORK = {
     ),
 }
 
-AUTH_USER_MODEL = 'users.User'
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
+}
+
+AUTH_USER_MODEL = 'users.CustomUser'

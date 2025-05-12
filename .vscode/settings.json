@@ -1,5 +1,35 @@
 {
   "files.associations": {
     "plyconfig.json": "jsonc"
-  }
+  },
+  "sqltools.connections": [
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "name": "11011",
+      "database": "task_db",
+      "username": "root",
+      "askForPassword": true
+    },
+    {
+      "mysqlOptions": {
+        "authProtocol": "default",
+        "enableSsl": "Disabled"
+      },
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 3306,
+      "driver": "MySQL",
+      "database": "tasks_db",
+      "username": "root",
+      "name": "11011",
+      "askForPassword": true
+    }
+  ]
 }

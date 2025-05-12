@@ -10,6 +10,9 @@ djangorestframework-simplejwt = "*"
 django-filter = "*"
 faker = "*"
 drf-nested-routers = "*"
+mysqlclient = "*"
+pytz = "*"
+celery = "*"
 
 [dev-packages]
 
