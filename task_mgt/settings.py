@@ -14,6 +14,8 @@ from pathlib import Path
 
 from datetime import timedelta
 
+from decouple import config
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
+    'celery'
 ]
 
 MIDDLEWARE = [
@@ -123,6 +126,7 @@ USE_I18N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
@@ -148,3 +152,21 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# set the celery broker url
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+# set the celery result backend
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# set the celery timezone
+CELERY_TIMEZONE = 'Africa/Lagos'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'jamesezekiel039@gmail.com'
+EMAIL_HOST_PASSWORD = 'ustp dico xfvv qflr'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

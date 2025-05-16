@@ -13,6 +13,8 @@ drf-nested-routers = "*"
 mysqlclient = "*"
 pytz = "*"
 celery = "*"
+redis = "*"
+python-decouple = "*"
 
 [dev-packages]
 

@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 import datetime
 import pytz
+from django.utils import timezone
 
 utc = pytz.UTC
 class TaskViewSet(ModelViewSet):
@@ -21,15 +22,21 @@ class TaskViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         deadline = serializer.validated_data['deadline']
-        if deadline and deadline <= utc.localize(datetime.datetime.now()):
+        print(f"Deadline: {deadline}")
+        print(f"now: {datetime.datetime.now()}")
+        if deadline and deadline <= timezone.now():
             return Response({
                 "error": "deadline cannot be a date/time that has passed"
             })
-            
+        deadline = deadline.astimezone(pytz.UTC)
+        serializer.validated_data['deadline'] = deadline
+        
+        print(f"Deadline UTC: {deadline}")
+        print(f"Submitted Deadline UTC: {serializer.validated_data['deadline']}")
         serializer.save()
-        status = Task.objects.get(id=serializer.data.get('id'))
-        status.status = "in_progress"
-        status.save()
+        task = Task.objects.get(id=serializer.data.get('id'))
+        task.status = "in_progress"
+        task.save()
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'])

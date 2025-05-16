@@ -9,3 +9,7 @@ sp_time = datetime.datetime(2005, 2, 22, 21)
 if now and now > sp_time:
     print("damn")
     
+    
+diff = timedelta()
+
+print(diff)
