@@ -45,3 +45,15 @@ class TaskViewSet(ModelViewSet):
         serializer = self.get_serializer(tasks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @action(methods=['patch'], detail=True, permission_classes=[IsAuthenticated])
+    def mark_complete(self, request, pk=None):
+        task = Task.objects.get(id=pk)
+        if task.status != 'completed':
+            task.status = "completed"
+            task.save()
+            return task
+        return Response(
+            self.get_serializer(task).data, status=status.HTTP_200_OK
+        )  
+    
+    
