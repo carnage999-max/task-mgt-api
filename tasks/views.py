@@ -8,12 +8,19 @@ from rest_framework.decorators import action
 import datetime
 import pytz
 from django.utils import timezone
+from django_filters import rest_framework as filters
+from rest_framework.filters import SearchFilter, OrderingFilter
+
 
 utc = pytz.UTC
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [filters.DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ('priority', 'status')
+    search_fields = ['name']
+    ordering = ['updated_at']
 
     def get_queryset(self):
         return self.queryset.filter(user=self.request.user)
