@@ -8,7 +8,7 @@ User = get_user_model()
 class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'is_active', 'is_staff')
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('email', 'password', 'telegram_chat_id')}),
         ('Permissions', {'fields': ('is_active', 'is_staff')}),
     )
     add_fieldsets = (

@@ -5,7 +5,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.utils import timezone
 import logging
-
+from .utils import send_telegram_message
 
 
 @shared_task
@@ -15,6 +15,8 @@ def mark_as_due_and_notify(task_id):
         if task.deadline <= timezone.now():
             logging.info(f"Task is due: sending email for task '{task.name}' to {task.user.email}")
             send_due_mail.delay(task.id)
+            message = f"Your task '{task.name}' is now due"
+            send_telegram_message(task.user.telegram_chat_id, message)
             task.status = 'completed'
             task.save()
     except Task.DoesNotExist:

@@ -34,7 +34,7 @@ class TaskViewSet(ModelViewSet):
         if deadline and deadline <= timezone.now():
             return Response({
                 "error": "deadline cannot be a date/time that has passed"
-            })
+            }, status=status.HTTP_401_UNAUTHORIZED)
         deadline = deadline.astimezone(pytz.UTC)
         serializer.validated_data['deadline'] = deadline
         
@@ -44,7 +44,7 @@ class TaskViewSet(ModelViewSet):
         task = Task.objects.get(id=serializer.data.get('id'))
         task.status = "in_progress"
         task.save()
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(detail=False, methods=['get'])
     def completed_tasks(self, request):
@@ -58,7 +58,6 @@ class TaskViewSet(ModelViewSet):
         if task.status != 'completed':
             task.status = "completed"
             task.save()
-            return task
         return Response(
             self.get_serializer(task).data, status=status.HTTP_200_OK
         )  

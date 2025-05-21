@@ -15,6 +15,9 @@ pytz = "*"
 celery = "*"
 redis = "*"
 python-decouple = "*"
+requests = "*"
+drf-spectacular = "*"
+django-unfold = "*"
 
 [dev-packages]
 

@@ -38,6 +38,7 @@ class CustomUser(AbstractUser):
         "unique": _("A user with that email already exists")
     })
     username = models.CharField(blank=True, null=True, default=None, max_length=10)
+    telegram_chat_id = models.CharField(max_length=64, blank=True, null=True)
     groups = models.ManyToManyField(
         Group,
         verbose_name=_("groups"),
