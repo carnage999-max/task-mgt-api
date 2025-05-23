@@ -16,7 +16,7 @@ class Task(models.Model):
         ('high', 'High'), ('urgent', 'Urgent')
     )
     user = models.ForeignKey('users.CustomUser', related_name='user_tasks', on_delete=models.CASCADE)
-    name = models.CharField(_("task name"), max_length=50, default='name')
+    name = models.CharField(_("task name"), max_length=50)
     description = models.TextField(blank=True, null=True)
     # repeat = models.CharField(_("repeat task"), max_length=10, choices=RepeatChoices)
     deadline = models.DateTimeField(_("task deadline"), blank=True, null=True)

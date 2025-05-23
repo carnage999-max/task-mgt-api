@@ -11,6 +11,7 @@ class TaskSerializer(serializers.ModelSerializer):
             'status', 'priority', 'created_at', 'updated_at', 'user_email'
         ]
         read_only_fields = ['id', 'user', 'created_at', 'updated_at', 'status']
+        required_fields = ['name']
 
     def create(self, validated_data):
         user = self.context['request'].user

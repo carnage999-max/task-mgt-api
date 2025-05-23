@@ -1,194 +1,153 @@
-Sure! Here's a high-end, professional `README.md` template tailored specifically for your **Task Management API** project, with advanced features like webhooks, Telegram/Discord integration, Celery tasks, and JWT auth—all resume-worthy.
+# Task Management API
+
+A simple yet robust Task Management API built with Django REST Framework and Celery, designed to handle user tasks with features such as scheduling, deadline notifications via email, and timezone-aware deadlines.
 
 ---
 
-````markdown
-# 📝 Task Management API
+## Features
 
-A lightweight yet powerful Task Management API built with Django, Django REST Framework, and Celery. Users can create, manage, and track tasks, receive deadline notifications via email, Telegram, or Discord, and integrate external tools like Google Calendar.
-
----
-
-## 🚀 Features
-
-- User authentication with JWT
-- Task creation, updates, and filtering
-- Deadline validation and automatic task status updates
-- Email notifications for due/overdue tasks
-- Telegram and Discord notification webhooks
-- Background task processing with Celery + Redis
-- OpenAPI documentation with DRF Spectacular
-- Timezone-aware scheduling
+* User authentication (JWT-based)
+* Create, read, update, and delete tasks
+* Searching and filtering of tasks
+* Task Rescheduling
+* Tasks with deadlines stored in timezone-aware format (UTC)
+* Automatic marking of tasks as completed when deadlines are reached
+* Reminder and due notification emails sent asynchronously using Celery
+* API endpoints follow RESTful conventions
+* Proper handling of timezone-naive and timezone-aware datetime inputs
 
 ---
 
-## 🛠️ Tech Stack
+## Technology Stack
 
-| Layer         | Technology                    |
-|---------------|-------------------------------|
-| Backend       | Django, Django REST Framework |
-| Auth          | Simple JWT                    |
-| Task Queue    | Celery                        |
-| Messaging     | Redis                         |
-| Notifications | Email, Telegram, Discord      |
-| Docs          | DRF Spectacular (Swagger/Redoc) |
-| Testing       | Pytest / Django TestCase      |
+* Python 3.12.4
+* Django & Django REST Framework
+* Celery with Redis (or your choice of broker) for asynchronous task processing
+* PostgreSQL / MySQL (or any Django-supported DB)
+* JWT Authentication (`djangorestframework-simplejwt`)
+* Docker (optional, for local development)
 
 ---
 
-## ⚙️ Setup Instructions
+## Getting Started
 
-### 1. Clone the repo
+### Prerequisites
 
-```bash
-git clone https://github.com/your-username/task-api.git
-cd task-api
-````
+* Python 3.12+
+* Redis (for Celery broker)
+* Database (PostgreSQL)
+* Docker (optional)
 
-### 2. Create `.env` file
+### Installation
 
-```env
-SECRET_KEY=your-secret
-DEBUG=True
-ALLOWED_HOSTS=localhost,127.0.0.1
-DATABASE_URL=...
-EMAIL_HOST=...
-TELEGRAM_BOT_TOKEN=...
-```
+1. Clone the repo:
 
-### 3. Install dependencies
+   ```bash
+   git clone https://github.com/carnage999-max/task-mgt-api.git
+   cd task-mgt-api
+   ```
 
-```bash
-pip install -r requirements.txt
-```
+2. Create and activate a virtual environment:
 
-### 4. Run migrations
+* Using venv:
+  
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   venv\Scripts\activate     # Windows
+   ```
 
-```bash
-python manage.py migrate
-```
+   Install dependencies:
 
-### 5. Run the server
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-```bash
-python manage.py runserver
-```
+* Using ``` pipenv ```(Recommended):
+  
+  ```bash
+   pipenv install
+   pipenv shell
+  ```
 
-### 6. Start Celery worker
+1. Set up environment variables in `.env` file (e.g., database credentials, email settings, Celery broker URL)
 
-```bash
-celery -A core worker -l info
-```
+2. Run migrations:
 
----
+   ```bash
+   python manage.py migrate
+   ```
 
-## 🔐 Authentication
+3. Start Redis server (or your Celery broker)
 
-* **Register**: `POST /api/auth/register/`
-* **Login**: `POST /api/auth/login/`
-* **JWT Token Usage**:
-  Add this to headers:
-  `Authorization: Bearer <your_access_token>`
+4. Run Celery worker:
 
----
+   ```bash
+   celery -A project_name worker --loglevel=info
+   ```
 
-## 📬 Notification Integration
+5. Run the development server:
 
-### Email
-
-* Sent automatically for due tasks
-
-### Telegram
-
-* Users click **"Subscribe to Telegram Notifications"**
-* A Telegram bot receives `/start <token>` and links the user's Telegram ID
-* Messages sent for upcoming/due tasks
-
-### Discord
-
-* Users can set a webhook URL via API
-* API posts notifications to Discord channel
+   ```bash
+   python manage.py runserver
+   ```
 
 ---
 
-## 📅 Webhook Integration (Planned)
+## API Usage
 
-* Google Calendar sync (planned)
-* Zapier integration (future)
+### Authentication
 
----
+* Obtain JWT tokens via `/api/token/` and `/api/token/refresh/`
+* Include the access token in the `Authorization` header as `Bearer <token>` for authenticated endpoints
 
-## 📄 API Documentation
+### Tasks Endpoints
 
-Interactive Docs available at:
-
-* Swagger UI: [`/api/schema/swagger-ui/`](http://localhost:8000/api/schema/swagger-ui/)
-* Redoc: [`/api/schema/redoc/`](http://localhost:8000/api/schema/redoc/)
-
-You can also export the OpenAPI schema at `/api/schema/`.
-
----
-
-## 🧪 Example Usage
-
-### Create a Task
-
-```bash
-curl -X POST http://localhost:8000/api/tasks/ \
-  -H "Authorization: Bearer <token>" \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Finish Resume", "deadline": "2025-05-20T13:00:00+01:00"}'
-```
+| Endpoint           | Method | Description                |
+| ------------------ | ------ | -------------------------- |
+| `/api/tasks/`      | GET    | List all tasks of the user |
+| `/api/tasks/`      | POST   | Create a new task          |
+| `/api/tasks/{id}/` | GET    | Retrieve a specific task   |
+| `/api/tasks/{id}/` | PUT    | Update a specific task     |
+| `/api/tasks/{id}/` | DELETE | Delete a specific task     |
 
 ---
 
-## 📁 Project Structure
+## Key Implementation Details
 
-```
-.
-├── api/               # Core API logic
-├── common/            # Shared models/utilities
-├── notifications/     # Email, Telegram, Discord
-├── celery.py          # Celery app instance
-├── requirements.txt
-└── manage.py
-```
+* **Timezone Handling:** Deadlines sent from clients are expected to include timezone information (ISO 8601 format). The backend converts and stores all deadlines in UTC.
+* **Task Scheduling:** Celery schedules tasks to automatically mark tasks as completed when their deadlines are reached and sends notification emails asynchronously.
+* **Email Notifications:** Users receive emails when their tasks are due. Email sending is managed by Celery to avoid blocking API responses.
 
 ---
 
-## 🌍 Deployment Tips
+## Future Improvements
 
-* Use [Gunicorn + Nginx](https://docs.gunicorn.org/en/stable/deploy.html)
-* Use environment variables for secret config
-* For production task queue, use Redis on Docker or a cloud Redis
-
----
-
-## 🧠 Ideas for Improvement
-
-* Google Calendar integration
-* Task priority levels
-* Recurring tasks
-* Shared projects/team support
-* REST hooks for external integrations
+* Add support for task priorities and labels
+* Implement social login (OAuth) for easier authentication
+* Add webhook integrations (Telegram, Discord) for notifications
+* Expand notifications with SMS or push notifications
+* Build frontend client with React or React Native
 
 ---
 
-## 📜 License
+## Contributing
 
-MIT License. See `LICENSE` file for details.
-
----
-
-## 👤 Author
-
-**Ezekiel Okebule**
-🔗 [ezekiel-okebule.vercel.app](https://ezekiel-okebule.vercel.app)
-📫 Reach out on Telegram or GitHub for collaboration or feedback.
-
-```
+Contributions are welcome! Feel free to open issues or submit pull requests.
 
 ---
 
-Let me know if you'd like this adapted for a **multi-user system**, **deployed version**, or **monorepo with frontend integration**.
-```
+## License
+
+MIT License
+
+---
+
+## Contact
+
+Your Name — [your.email@example.com](mailto:your.email@example.com)
+GitHub: [https://github.com/yourusername](https://github.com/yourusername)
+
+---
+
+If you want, I can help customize any section or generate a `requirements.txt` snippet as well!

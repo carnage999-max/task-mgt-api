@@ -29,17 +29,12 @@ class TaskViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         deadline = serializer.validated_data['deadline']
-        print(f"Deadline: {deadline}")
-        print(f"now: {datetime.datetime.now()}")
         if deadline and deadline <= timezone.now():
             return Response({
                 "error": "deadline cannot be a date/time that has passed"
             }, status=status.HTTP_401_UNAUTHORIZED)
         deadline = deadline.astimezone(pytz.UTC)
         serializer.validated_data['deadline'] = deadline
-        
-        print(f"Deadline UTC: {deadline}")
-        print(f"Submitted Deadline UTC: {serializer.validated_data['deadline']}")
         serializer.save()
         task = Task.objects.get(id=serializer.data.get('id'))
         task.status = "in_progress"

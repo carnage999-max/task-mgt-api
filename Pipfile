@@ -18,6 +18,13 @@ python-decouple = "*"
 requests = "*"
 drf-spectacular = "*"
 django-unfold = "*"
+factory-boy = "*"
+django-oauth-toolkit = "*"
+django-celery-beat = "*"
+psycopg2-binary = "*"
+gunicorn = "*"
+uvicorn = "*"
+dj-database-url = "*"
 
 [dev-packages]
 
