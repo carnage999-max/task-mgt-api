@@ -96,6 +96,18 @@ WSGI_APPLICATION = 'task_mgt.wsgi.application'
 # Replace the DATABASES section of your settings.py with this
 tmpPostgres = urlparse(config("DATABASE_URL"))
 
+if not DEBUG:
+    DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config("DATABASE_NAME"),
+        'USER': config("DATABASE_USER"),
+        'PASSWORD': config("DATABASE_PASSWORD"),
+        'HOST': "localhost",
+        'PORT': 3306,
+    }
+}
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
