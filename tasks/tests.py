@@ -102,6 +102,13 @@ class TaskUpdateTests(BaseTaskTestCase):
         self.task.refresh_from_db()
         self.assertEqual(self.task.name, "A new hope")
         
+    def test_updating_a_completed_task(self):
+        self.task.status = "completed"
+        data = {"deadline": self.task.deadline + timedelta(days=7)}
+        response = self.client.put(reverse('task-detail', kwargs={'pk': self.task.id}), data=data)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        
+        
 class TaskCountTests(BaseTaskTestCase):
     def test_database_count_increase_on_task_create(self):
         count_before = Task.objects.count()

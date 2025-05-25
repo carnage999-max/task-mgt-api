@@ -99,17 +99,6 @@ tmpPostgres = urlparse(config("DATABASE_URL"))
 if not DEBUG:
     DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config("DATABASE_NAME"),
-        'USER': config("DATABASE_USER"),
-        'PASSWORD': config("DATABASE_PASSWORD"),
-        'HOST': "localhost",
-        'PORT': 3306,
-    }
-}
-
-DATABASES = {
-    'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': tmpPostgres.path.replace('/', ''),
         'USER': tmpPostgres.username,
@@ -117,6 +106,17 @@ DATABASES = {
         'HOST': tmpPostgres.hostname,
         'PORT': 5432,
     }
+}
+    
+DATABASES = {
+'default': {
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': config("DATABASE_NAME"),
+    'USER': config("DATABASE_USER"),
+    'PASSWORD': config("DATABASE_PASSWORD"),
+    'HOST': "localhost",
+    'PORT': 3306,
+}
 }
 
 
@@ -173,8 +173,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -195,8 +195,6 @@ EMAIL_PORT = config("EMAIL_PORT", cast=str, default='587') # Recommended
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str, default=None)
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str, default=None)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", cast=bool, default=True)  # Use EMAIL_PORT 587 for TLS
-
-TELEGRAM_BOT_TOKEN = config("TELEGRAM_BOT_TOKEN", cast=str, default=None)
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Task Management API',

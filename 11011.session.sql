@@ -1,1 +1,0 @@
-SELECT * from tasks_task

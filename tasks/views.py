@@ -40,6 +40,14 @@ class TaskViewSet(ModelViewSet):
         task.status = "in_progress"
         task.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.status == "completed":
+            return Response(
+                {"detail": "Completed tasks cannot be edited"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().update(request, *args, **kwargs)
 
     @action(detail=False, methods=['get'])
     def completed_tasks(self, request):
