@@ -26,6 +26,8 @@ gunicorn = "*"
 uvicorn = "*"
 dj-database-url = "*"
 whitenoise = "*"
+django-markdown-view = "*"
+markdown = "*"
 
 [dev-packages]
 

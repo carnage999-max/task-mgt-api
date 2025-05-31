@@ -17,8 +17,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenRefreshView
+import os, markdown
+from django.conf import settings
+from django.http import HttpResponse
+
+
+# View to render a Markdown file
+def api_docs_view(request):
+    file_path = os.path.join(settings.BASE_DIR, 'README.md')
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        html = markdown.markdown(content)
+        return HttpResponse(html)
+    
+    
 urlpatterns = [
+    path('', api_docs_view, name='docs-page'),
     path('admin/', admin.site.urls),
     path('api/v1/users/', include('users.urls')),
     path('api/v1/task/', include('tasks.urls')),
