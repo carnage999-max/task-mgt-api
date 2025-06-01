@@ -54,8 +54,6 @@ INSTALLED_APPS = [
     'django_filters',
     'celery',
     'drf_spectacular',
-    
-    'markdown_view',
 ]
 
 MIDDLEWARE = [
