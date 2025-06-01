@@ -54,6 +54,8 @@ INSTALLED_APPS = [
     'django_filters',
     'celery',
     'drf_spectacular',
+    
+    'markdown_view',
 ]
 
 MIDDLEWARE = [
@@ -96,28 +98,29 @@ WSGI_APPLICATION = 'task_mgt.wsgi.application'
 # Replace the DATABASES section of your settings.py with this
 tmpPostgres = urlparse(config("DATABASE_URL"))
 
+
 DATABASES = {
-'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': tmpPostgres.path.replace('/', ''),
-    'USER': tmpPostgres.username,
-    'PASSWORD': tmpPostgres.password,
-    'HOST': tmpPostgres.hostname,
-    'PORT': 5432,
-}
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': tmpPostgres.path.replace('/', ''),
+        'USER': tmpPostgres.username,
+        'PASSWORD': tmpPostgres.password,
+        'HOST': tmpPostgres.hostname,
+        'PORT': 5432,
+    }
 }
 
 if DEBUG:
     DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': config("DATABASE_NAME"),
-        'USER': config("DATABASE_USER"),
-        'PASSWORD': config("DATABASE_PASSWORD"),
-        'HOST': "localhost",
-        'PORT': 3306,
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': config("DATABASE_NAME"),
+            'USER': config("DATABASE_USER"),
+            'PASSWORD': config("DATABASE_PASSWORD"),
+            'HOST': "localhost",
+            'PORT': 3306,
+        }
     }
-}
 
 
 # Password validation
@@ -182,6 +185,9 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # set the celery broker url
 CELERY_BROKER_URL = config("REDIS_URL")
 
+if DEBUG:
+    CELERY_BROKER_URL = "redis://127.0.0.1:6379/0"
+
 # set the celery result backend
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 
@@ -208,3 +214,9 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+LOGIN_URL = '/admin/login/'
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+MARKDOWN_VIEW_BASE_DIR = os.path.join(BASE_DIR, 'docs')
