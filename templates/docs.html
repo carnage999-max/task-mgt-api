@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Task Management API Docs</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+  <style>
+    body {
+      background-color: #121212;
+      color: #e0e0e0;
+      font-family: 'Segoe UI', sans-serif;
+      line-height: 1.8;
+      padding-bottom: 5rem;
+    }
+    h1, h2, h3, h4 {
+      color: #ffffff;
+      font-weight: 600;
+    }
+    pre {
+      background-color: #1e1e1e;
+      color: #dcdcdc;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-size: 0.95rem;
+      overflow-x: auto;
+      border: 1px solid #333;
+    }
+    code {
+      color: #ffc107;
+      background-color: rgba(255, 255, 255, 0.05);
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.25rem;
+      font-family: "Courier New", monospace;
+    }
+    hr {
+      border-color: #444;
+      margin: 2rem 0;
+    }
+    ul, ol {
+      padding-left: 1.5rem;
+    }
+    table {
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+    th, td {
+      border: 1px solid #444 !important;
+    }
+    a {
+      color: #90caf9;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <h1 class="mb-4">Task Management API</h1>
+    <p><a href="https://github.com/carnage999-max/task-mgt-api.git" target="_blank" style="text-decoration: none;"><i class="bi bi-github" style="font-size: 2em; color: #007bff;"></i> Visit GitHub Repo</a></p>
+    <p><a href="https://task-mgt-api-ehvi.onrender.com/api/schema/swagger-ui/" target="_blank" style="text-decoration: none;"><i class="bi bi-link-45deg" style="font-size: 2em; color: #007bff;"></i> Test REST API</a></p>
+    <p class="lead">A simple yet robust Task Management API built with Django REST Framework and Celery...</p>
+    <hr>
+    <h2>Features</h2>
+    <ul>
+      <li>User authentication (JWT-based)</li>
+      <li>Create, read, update, and delete tasks</li>
+      <li>Searching and filtering of tasks</li>
+      <li>Task Rescheduling</li>
+      <li>Timezone-aware deadlines</li>
+      <li>Auto-completion of tasks via Celery</li>
+      <li>Email notifications for due and reminder</li>
+    </ul>
+
+    <hr>
+    <h2>Technology Stack</h2>
+    <ul>
+      <li>Python 3.12.4</li>
+      <li>Django & DRF</li>
+      <li>Celery + Redis</li>
+      <li>PostgreSQL / MySQL</li>
+      <li>JWT Auth</li>
+    </ul>
+
+    <hr>
+    <h2>Getting Started</h2>
+    <h4>Prerequisites</h4>
+    <ul>
+      <li>Python 3.12+</li>
+      <li>Redis</li>
+      <li>PostgreSQL</li>
+    </ul>
+
+    <h4>Installation</h4>
+    <pre><code>git clone https://github.com/carnage999-max/task-mgt-api.git
+
+cd task-mgt-api
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+python manage.py migrate
+celery -A project_name worker --loglevel=info
+python manage.py runserver</code></pre>
+
+    <hr>
+    <h2>API Usage</h2>
+    <h4>Authentication</h4>
+    <pre><code>POST /api/v1/users/login/
+
+{
+  "email": "user@example.com",
+  "password": "secret"
+}</code></pre>
+
+    <h4>Authorization Header</h4>
+    <pre><code>Authorization: Bearer &lt;token&gt;</code></pre>
+
+    <hr>
+    <h4>Tasks Endpoints</h4>
+    <table class="table table-bordered">
+      <thead><tr><th>Endpoint</th><th>Method</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>/api/v1/task/tasks/</td><td>GET</td><td>List tasks</td></tr>
+        <tr><td>/api/v1/task/tasks/</td><td>POST</td><td>Create task</td></tr>
+        <tr><td>/api/v1/task/tasks/{id}/</td><td>GET</td><td>Retrieve task</td></tr>
+        <tr><td>/api/v1/task/tasks/{id}/</td><td>PUT</td><td>Update task</td></tr>
+        <tr><td>/api/v1/task/tasks/{id}/</td><td>DELETE</td><td>Delete task</td></tr>
+        <tr><td>/api/v1/task/tasks/{id}/mark_complete/</td><td>PATCH</td><td>Mark as complete</td></tr>
+      </tbody>
+    </table>
+
+    <h4>Create Task</h4>
+    <pre><code>POST /api/v1/task/tasks/
+
+{
+  "name": "Finish report",
+  "description": "Weekly summary report",
+  "deadline": "2025-06-01T15:00:00+01:00",
+  "priority": "high"
+}</code></pre>
+
+    <h4>Sample Response</h4>
+    <pre><code>{
+  "id": 1,
+  "name": "Finish Report",
+  "status": "in_progress",
+  ...
+}</code></pre>
+
+    <h4>Retrieve Task</h4>
+    <pre><code>GET /api/v1/task/tasks/1/</code></pre>
+
+    <h4>Reschedule Task</h4>
+    <pre><code>PUT /api/v1/task/tasks/1/
+
+{
+  "deadline": "2026-06-01T15:00:00+01:00"
+}</code></pre>
+
+    <hr>
+    <h2>Key Implementation Details</h2>
+    <ul>
+      <li>Deadlines stored in UTC</li>
+      <li>Auto-complete with Celery</li>
+      <li>Email reminders</li>
+    </ul>
+
+    <hr>
+    <h2>Future Improvements</h2>
+    <ul>
+      <li>Subtasks</li>
+      <li>OAuth login</li>
+      <li>Telegram/Discord webhook notifications</li>
+    </ul>
+
+    <hr>
+    <h2>License</h2>
+    <p>MIT</p>
+
+    <hr>
+    <h2>Contact</h2>
+    <p>Ezekiel Okebule — <a href="mailto:jamesezekiel039@gmail.com">jamesezekiel039@gmail.com</a></p>
+    <p><a href="https://github.com/carnage999-max" target="_blank"><i class="bi bi-github" style="font-size: 2em; color: #007bff;"></i> GitHub</a></p>
+    <p><a href="https://linkedin.com/ezekiel-okebule" target="_blank"><i class="bi bi-linkedin" style="font-size: 2em; color: #007bff;"></i> LinkedIn</a></p>
+  </div>
+</body>
+</html>

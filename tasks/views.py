@@ -10,9 +10,14 @@ import pytz
 from django.utils import timezone
 from django_filters import rest_framework as filters
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.shortcuts import render
 
 
 utc = pytz.UTC
+
+def docs(request):
+    return render(request, "docs.html")
+
 class TaskViewSet(ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
