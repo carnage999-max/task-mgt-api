@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import IsAuthenticated
 
 User = get_user_model()
@@ -42,4 +42,16 @@ class GetUserViewSet(ReadOnlyModelViewSet):
     
     def get_queryset(self):
         return self.queryset.filter(email=self.request.user)
+    
+    @action(methods=['patch'], detail=False, url_path='update-telegram-chat-id')
+    def update_telegram_id(self, request):
+        chat_id = request.data.get("chat_id")
+        if not chat_id:
+            return Response({'error': "chat_id is required when enabling notifications"}, status=status.HTTP_400_BAD_REQUEST)
+        user, created = User.objects.get_or_create(id=request.user.id)
+        user.telegram_chat_id = chat_id if chat_id else user.telegram_chat_id
+        user.save()
+        return Response(
+            {'message': 'Telegram ID successfully updated'}, status=status.HTTP_200_OK
+        )
             

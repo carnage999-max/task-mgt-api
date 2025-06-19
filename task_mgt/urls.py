@@ -19,6 +19,23 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework_simplejwt.views import TokenRefreshView
 from tasks.views import docs
+from django.shortcuts import render
+import os
+from django.http import HttpResponse, HttpResponseForbidden
+import logging
+
+
+logger = logging.getLogger(__name__)
+
+def index(request):
+    return render(request, 'index.html')
+
+def ping_site(request):
+    if request.headers.get("X-Cron-Token") != os.getenv("CRON_SECRET_TOKEN"):
+        logger.warning(f"Unauthorized ping attempt from {request.META.get('REMOTE_ADDR')}")
+        return HttpResponseForbidden("Forbidden")
+    logger.info("Ping successful")
+    return HttpResponse("Hello World")
     
     
 urlpatterns = [
@@ -33,4 +50,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('docs/', docs, name='docs'),
     path('', docs, name='docs'),
+    path('ping/', ping_site, name='ping'),
 ]

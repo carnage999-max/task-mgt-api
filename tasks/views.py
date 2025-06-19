@@ -70,4 +70,3 @@ class TaskViewSet(ModelViewSet):
             self.get_serializer(task).data, status=status.HTTP_200_OK
         )  
     
-    

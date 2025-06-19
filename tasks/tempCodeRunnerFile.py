@@ -1,1 +1,0 @@
-now-sp_time

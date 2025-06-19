@@ -2,7 +2,7 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.timezone import is_aware
 from .models import Task
-from .task import mark_as_due_and_notify, send_reminder_email
+from .task import mark_as_due_and_notify, send_reminder_email, send_telegram_notification
 import pytz
 
 utc = pytz.UTC
@@ -21,3 +21,4 @@ def schedule_task_deadlines(sender, instance, created, **kwargs):
         if reminder_time > 0:
             send_reminder_email.apply_async((instance.id,), countdown=reminder_time)
         mark_as_due_and_notify.apply_async(args=(instance.id,), eta=eta)
+        send_telegram_notification.apply_async(args=(instance.id,), eta=eta)

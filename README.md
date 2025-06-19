@@ -1,6 +1,6 @@
 # Task Management API
 
-A simple yet robust Task Management API built with Django REST Framework and Celery, designed to handle user tasks with features such as scheduling, deadline notifications via email, and timezone-aware deadlines.
+A simple yet robust Task Management API built with Django REST Framework and Celery, designed to handle user tasks with features such as scheduling, deadline notifications via email and Telegram, and timezone-aware deadlines.
 
 ---
 
@@ -16,13 +16,14 @@ A simple yet robust Task Management API built with Django REST Framework and Cel
   - [API Usage](#api-usage)
     - [Authentication](#authentication)
     - [Tasks Endpoints](#tasks-endpoints)
-    - [Sample Requests \& Responses](#sample-requests--responses)
+    - [Telegram Notifications](#telegram-notifications) <!-- NEW -->
+    - [Sample Requests & Responses](#sample-requests--responses)
       - [Create Task](#create-task)
       - [Retrieve Task](#retrieve-task)
       - [Delete Task](#delete-task)
       - [Task Rescheduling](#task-rescheduling)
-  - [Key Implementation Details](#key-implementation-details)
-  - [Future Improvements](#future-improvements)
+      - [Update Telegram Chat ID](#update-telegram-chat-id)
+  - [Future Improvements](#future-improvements) <!-- MODIFIED -->
   - [Contributing](#contributing)
   - [License](#license)
   - [Contact](#contact)
@@ -38,6 +39,7 @@ A simple yet robust Task Management API built with Django REST Framework and Cel
 - Tasks with deadlines stored in timezone-aware format (UTC)
 - Automatic marking of tasks as completed when deadlines are reached
 - Reminder and due notification emails sent asynchronously using Celery
+- Telegram notifications for task deadlines (opt-in) <!-- NEW -->
 - API endpoints follow RESTful conventions
 - Proper handling of timezone-naive and timezone-aware datetime inputs
 
@@ -94,7 +96,7 @@ A simple yet robust Task Management API built with Django REST Framework and Cel
    pipenv shell
   ```
 
-3. Set up environment variables in `.env` file (e.g., database credentials, email settings, Celery broker URL)
+3. Set up environment variables in `.env` file (e.g., database credentials, email settings, Celery broker URL, Telegram bot token) <!-- MODIFIED -->
 
 4. Run migrations:
 
@@ -122,7 +124,7 @@ A simple yet robust Task Management API built with Django REST Framework and Cel
 
 ### Authentication
 
-- Obtain JWT tokens(login) via:
+- Obtain JWT tokens (login) via:
 
    ```http
    POST /api/v1/users/login/
@@ -162,14 +164,36 @@ A simple yet robust Task Management API built with Django REST Framework and Cel
 
 ### Tasks Endpoints
 
-| Endpoint                 | Method | Description                |
-|--------------------------|--------|----------------------------|
-| `/api/v1/task/tasks/`    | GET    | List all user tasks        |
-| `/api/v1/task/tasks/`    | POST   | Create a new task          |
-| `/api/v1/task/tasks/{id}/` | GET  | Retrieve a specific task   |
-| `/api/v1/task/tasks/{id}/` | PUT  | Update a specific task     |
-| `/api/v1/task/tasks/{id}/` | DELETE| Delete a specific task     |
-| `/api/v1/task/tasks/{id}/mark_complete/` | PATCH| Mark a specific task as "completed"     |
+| Endpoint                          | Method | Description                        |
+|-----------------------------------|--------|------------------------------------|
+| `/api/v1/task/tasks/`             | GET    | List all user tasks                |
+| `/api/v1/task/tasks/`             | POST   | Create a new task                  |
+| `/api/v1/task/tasks/{id}/`        | GET    | Retrieve a specific task           |
+| `/api/v1/task/tasks/{id}/`        | PUT    | Update a specific task             |
+| `/api/v1/task/tasks/{id}/`        | DELETE | Delete a specific task             |
+| `/api/v1/task/tasks/{id}/mark_complete/` | PATCH | Mark a specific task as "completed" |
+
+---
+
+### Telegram Notifications <!-- NEW -->
+
+Users can opt to receive Telegram notifications for task deadlines. To enable this feature, follow these steps:
+
+1. **Obtain Your Telegram Chat ID**:
+   - Open Telegram and message `@userinfobot`. Send `/start` to receive your chat ID (e.g., `0027981002`).
+
+2. **Initiate a Session with the Telegram Bot**:
+   - Message the API’s Telegram bot at `@BinaryTaskReminder_bot` (replace with the actual bot username provided by the API response).
+   - Send `/start` to allow the bot to send you notifications. This is a Telegram requirement.
+
+3. **Update Your Profile**:
+   - Send a POST request to the `/api/v1/users/update-telegram-chat-id/` endpoint with your chat ID and notification preference.
+   - See the [Update Telegram Chat ID](#update-telegram-chat-id) section for details.
+
+4. **Receive Notifications**:
+   - When a task’s deadline is reached, you’ll receive a Telegram message (e.g., “Reminder: Task 'Finish report' deadline reached on 2025-06-01 15:00!”) if notifications are enabled.
+
+**Note**: Ensure you send `/start` to `@BinaryTaskReminder_bot` before enabling notifications, or the bot will return a “chat not found” error.
 
 ---
 
@@ -187,10 +211,10 @@ Request Body:
 
 ```json
 {
-  "name": "Finish report", // Required 
+  "name": "Finish report",
   "description": "Weekly summary report",
   "deadline": "2025-06-01T15:00:00+01:00",
-  "priority": "high" // possible values are high, low, medium, urgent
+  "priority": "high"
 }
 ```
 
@@ -246,59 +270,94 @@ DELETE /api/v1/task/tasks/1/
 Authorization: Bearer <access_token>
 ```
 
-Response (200 Ok)
+Response (204 No Content)
 
 ---
 
 #### Task Rescheduling
 
-Task can be rescheduled by sending a `PUT` request to the API and updating the deadline.
-Task with `status` of `completed` cannot be updated
+Task can be rescheduled by sending a `PUT` request to the API and updating the deadline. Tasks with `status` of `completed` cannot be updated.
 
 ```http
-   PUT api/v1/task/tasks/1/
-   Authorization: Bearer <access_token>
+PUT /api/v1/task/tasks/1/
+Authorization: Bearer <access_token>
 ```
 
 Request Body:
 
 ```json
-   {
-      "deadline": "2026-06-01T15:00:00+01:00"
-   }
-```
-
-Response (200)
-
-```json
-   {
-   "id": 1,
-   "user": 1,
-   "name": "Do laundry",
-   "description": "Weekly summary report",
-   "deadline": "2026-06-01T15:00:00+01:00",
-   "status": "in_progress",
-   "priority": "high",
-   "created_at": "datetime",
-   "updated_at": "datetime",
-   "user_email": "useremail@gmail.com"
+{
+  "deadline": "2026-06-01T15:00:00+01:00"
 }
 ```
 
-## Key Implementation Details
+Response (200 OK):
 
-- **Timezone Handling:** Deadlines sent from clients are expected to include timezone information (ISO 8601 format). The backend converts and stores all deadlines in UTC.
-- **Task Scheduling:** Celery schedules tasks to automatically mark tasks as completed when their deadlines are reached and sends notification emails asynchronously.
-- **Email Notifications:** Users receive emails when their tasks are due. Email sending is managed by Celery to avoid blocking API responses.
+```json
+{
+  "id": 1,
+  "user": 1,
+  "name": "Do laundry",
+  "description": "Weekly summary report",
+  "deadline": "2026-06-01T15:00:00+01:00",
+  "status": "in_progress",
+  "priority": "high",
+  "created_at": "datetime",
+  "updated_at": "datetime",
+  "user_email": "useremail@gmail.com"
+}
+```
 
 ---
 
-## Future Improvements
+#### Update Telegram Chat ID <!-- NEW -->
+
+```http
+POST /api/v1/users/update-telegram-chat-id/
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Request Body:
+
+```json
+{
+  "chat_id": "1234567890",
+}
+```
+
+Response (200 OK):
+
+```json
+{
+  "message": "Telegram chat ID and notification preference updated",
+}
+```
+
+**Notes**:
+- `telegram_chat_id`: Your Telegram chat ID (required if `receive_telegram_notifications` is `true`).
+- `receive_telegram_notifications`: Set to `true` to enable Telegram notifications (default: `false`).
+- After sending this request, message `@YourBotName` in Telegram and send `/start` to allow notifications.
+- If `receive_telegram_notifications` is set to `false`, no Telegram notifications will be sent, even if a `telegram_chat_id` is provided.
+
+---
+
+## Key Implementation Details <!-- MODIFIED -->
+
+- **Timezone Handling**: Deadlines sent from clients are expected to include timezone information (ISO 8601 format). The backend converts and stores all deadlines in UTC.
+- **Task Scheduling**: Celery schedules tasks to automatically mark tasks as completed when their deadlines are reached and sends notification emails and Telegram messages asynchronously.
+- **Email Notifications**: Users receive emails when their tasks are due. Email sending is managed by Celery to avoid blocking API responses.
+- **Telegram Notifications**: Users who opt in receive Telegram messages when task deadlines are reached. Notifications are sent via the Telegram Bot API using a bot (`@BinaryTaskReminder_bot`). Users must send `/start` to the bot to enable messaging.
+
+---
+
+## Future Improvements <!-- MODIFIED -->
 
 - Add support for Subtasks
 - Implement social login (OAuth) for easier authentication
-- Add webhook integrations (Telegram, Discord) for notifications
+- Add webhook integrations (Discord, Slack) for notifications
 - Expand notifications with push notifications
+- Automate Telegram bot session initiation via deep links
 
 ---
 
